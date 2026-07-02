@@ -54,3 +54,10 @@ An interactive brute-force session was executed by driving multiple high-privile
 * **System Response:** The Linux Pluggable Authentication Module (PAM) tripped its lockout boundary rule, logging `sudo: maximum 3 incorrect authentication attempts` directly to `/var/log/auth.log`.
 * **SIEM Capture:** Filebeat intercepted the delta modification instantly, passing the raw string to Elasticsearch.
 * **Analyst Viewpoint:** Utilizing a custom Kibana Data View mapped against `filebeat-*` and filtered by the columns `log.file.path` and `message`, the attack pattern was successfully tracked and contextualized via the following KQL query:
+```plaintext
+message: "failure" or message: "failed"
+```
+
+##🛠️ Repository File Structure
+* `docker-compose.yml` - Contains multi-container definitions, shared host networking arrays, and internal resource constraints.
+* `config/filebeat.yml` - Explicit path harvesting configurations pointing to system event brokers with disabled Elasticsearch security overrides for localized host testing.
