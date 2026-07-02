@@ -31,3 +31,26 @@ The environment orchestrates three distinct operational layers using Docker Cont
                     │
                     ▼ (Live Harvesting)
              /var/log/auth.log  &  /var/log/syslog
+```
+The Orchestrated Sequencing Solution
+To prevent resource exhaustion (NS_ERROR_NET_EMPTY_RESPONSE) caused by parallel JVM and Node.js compilation spikes, the infrastructure must be initialized using staged dependency boot ordering:
+1. Initialize the storage engine exclusively:
+   ```bash
+   sudo docker compose up -d elasticsearch
+   ```
+2. Wait for the REST API endpoint handshake loop to clear:
+   ```bash
+   curl http://localhost:9200
+   ```
+3. Boot the visualization dashboard and telemetry collector once the database declares healthy status:
+   ```bash
+   sudo docker compose up -d kibana
+   sudo docker start soc-filebeat-agent
+   ```
+## 🎯 Forensic Capabilities & Verified Simulations (ESSENCE)
+The true value of this deployment was validated by executing a credential attack simulation and auditing the resulting log generation cycle.
+### Verified Incident: Host-Based Brute Force Simulation
+An interactive brute-force session was executed by driving multiple high-privilege execution anomalies against the local security system boundary (`sudo ls /root`).
+* **System Response:** The Linux Pluggable Authentication Module (PAM) tripped its lockout boundary rule, logging `sudo: maximum 3 incorrect authentication attempts` directly to `/var/log/auth.log`.
+* **SIEM Capture:** Filebeat intercepted the delta modification instantly, passing the raw string to Elasticsearch.
+* **Analyst Viewpoint:** Utilizing a custom Kibana Data View mapped against `filebeat-*` and filtered by the columns `log.file.path` and `message`, the attack pattern was successfully tracked and contextualized via the following KQL query:
