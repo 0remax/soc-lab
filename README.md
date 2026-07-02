@@ -61,3 +61,18 @@ message: "failure" or message: "failed"
 ##🛠️ Repository File Structure
 * `docker-compose.yml` - Contains multi-container definitions, shared host networking arrays, and internal resource constraints.
 * `config/filebeat.yml` - Explicit path harvesting configurations pointing to system event brokers with disabled Elasticsearch security overrides for localized host testing.
+## 🚨 SIEM Behavioral Detection Engineering
+
+To transition the platform from a passive log repository into an active defense mechanism, a real-time behavioral alerting rule was engineered directly into the Kibana analytics engine.
+
+### Rule Configuration: Host-Based Brute Force Threshold Detection
+Rather than relying on manual monitoring, the SIEM dynamically parses incoming logs for brute-force telemetry spikes using the following structured threshold rule:
+
+*   **Rule Type:** Threshold Condition Rule
+*   **Target Data Index:** `filebeat-*`
+*   **Behavioral Query Filter (KQL):** `message: "failed" or message: "failure"`
+*   **Aggregation Vector:** Grouped by `agent.hostname`
+*   **Condition Threshold:** Count `> 2` matching events within a `5-minute` rolling window.
+
+### Operational Intent
+By grouping the threshold condition explicitly by `agent.hostname`, the SIEM correlates localized noise. If an adversary attempts 50 rapid credential sprays against a single asset, the rule collapses the noise and fires a single, actionable security alert case rather than triggering 50 individual event notifications—effectively preventing analyst alert fatigue.
